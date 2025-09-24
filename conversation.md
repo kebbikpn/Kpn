@@ -1,0 +1,1 @@
+User requested full production-ready website for KPN2020 based on overview document. Includes Flask modular apps, SQLite DB with preloaded seed data, role-based dashboards, donations, media, events, disciplinary system, Facebook verification, deployment setup.

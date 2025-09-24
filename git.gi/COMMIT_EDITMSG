@@ -1,0 +1,8 @@
+Fix member management actions by adding CSRF tokens
+
+Add CSRF tokens to the promote, demote, and swap member forms in the manage_members.html template to resolve "Method Not Allowed" errors.
+
+Replit-Commit-Author: Agent
+Replit-Commit-Session-Id: 421a2ac7-d03b-40b7-9f4e-05e4bc8fc588
+Replit-Commit-Checkpoint-Type: full_checkpoint
+Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/e5a58628-2518-4e9f-9b03-37a690a0a0e7/421a2ac7-d03b-40b7-9f4e-05e4bc8fc588/zBrRr5l

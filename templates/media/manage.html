@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Media{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-kpn-green">
+            <i class="fas fa-photo-video"></i> Manage Media
+        </h2>
+        <a href="{{ url_for('media.upload') }}" class="btn btn-kpn-primary">
+            <i class="fas fa-plus"></i> Upload Media
+        </a>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Preview</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Uploaded By</th>
+                            <th>Status</th>
+                            <th>Upload Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for media in media_files %}
+                        <tr>
+                            <td>
+                                {% if media.file_type == 'photo' %}
+                                <img src="{{ url_for('static', filename=media.file_path) }}" 
+                                     alt="{{ media.title }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-secondary d-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-video text-white"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ media.title }}</strong>
+                                {% if media.description %}
+                                <br>
+                                <small class="text-muted">{{ media.description[:50] }}{% if media.description|length > 50 %}...{% endif %}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if media.file_type == 'photo' %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-image"></i> Photo
+                                </span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-video"></i> Video
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>{{ media.uploaded_by.full_name }}</td>
+                            <td>
+                                {% if media.public %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-eye"></i> Public
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-eye-slash"></i> Private
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small>{{ media.created_at.strftime('%m/%d/%Y') }}</small>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" title="View" 
+                                            onclick="viewMedia('{{ media.file_path }}', '{{ media.file_type }}', '{{ media.title }}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" title="Delete"
+                                            onclick="confirmDelete('{{ media.title }}', {{ media.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-2x mb-3"></i>
+                                <br>
+                                No media files found. <a href="{{ url_for('media.upload') }}">Upload your first media file</a>.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Media Preview Modal -->
+<div class="modal fade" id="mediaModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mediaModalTitle">Media Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center" id="mediaModalBody">
+                <!-- Media content will be inserted here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewMedia(filePath, fileType, title) {
+    document.getElementById('mediaModalTitle').textContent = title;
+    const modalBody = document.getElementById('mediaModalBody');
+    
+    if (fileType === 'photo') {
+        modalBody.innerHTML = '<img src="/static/' + filePath + '" class="img-fluid" alt="' + title + '">';
+    } else {
+        modalBody.innerHTML = '<video class="w-100" controls><source src="/static/' + filePath + '" type="video/mp4"></video>';
+    }
+    
+    new bootstrap.Modal(document.getElementById('mediaModal')).show();
+}
+
+function confirmDelete(title, id) {
+    if (confirm('Are you sure you want to delete "' + title + '"?')) {
+        // Add delete functionality here
+        alert('Delete functionality not implemented yet');
+    }
+}
+</script>
+{% endblock %}

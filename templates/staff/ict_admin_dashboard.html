@@ -1,0 +1,511 @@
+{% extends "base.html" %}
+
+{% block title %}ICT System Administrator Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 ict-admin-theme">
+    <!-- Personalized Greeting -->
+    <div class="greeting-container">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-hand-wave greeting-icon"></i>
+            <p class="greeting-text" id="personalized-greeting"></p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark mb-0">
+                <i class="fas fa-cogs"></i> ICT System Administrator Dashboard
+            </h2>
+            <p class="text-muted">System Overview & Monitoring - {{ current_user.full_name }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge bg-danger fs-6">ICT ADMIN</span>
+            <a href="{{ url_for('staff.logout') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- System Health Status -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-heartbeat"></i> System Health Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-2">
+                            <div class="health-metric">
+                                <i class="fas fa-database fa-2x {% if system_health.database_status == 'online' %}text-success{% else %}text-danger{% endif %}"></i>
+                                <p class="mb-0"><strong>Database</strong></p>
+                                <span class="badge {% if system_health.database_status == 'online' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ system_health.database_status|title }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="health-metric">
+                                <i class="fas fa-hdd fa-2x {% if system_health.storage_usage < 80 %}text-success{% else %}text-warning{% endif %}"></i>
+                                <p class="mb-0"><strong>Storage</strong></p>
+                                <span class="badge {% if system_health.storage_usage < 80 %}bg-success{% else %}bg-warning{% endif %}">
+                                    {{ system_health.storage_usage }}%
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="health-metric">
+                                <i class="fas fa-users fa-2x text-info"></i>
+                                <p class="mb-0"><strong>Active Sessions</strong></p>
+                                <span class="badge bg-info">{{ system_health.active_sessions }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="health-metric">
+                                <i class="fas fa-clock fa-2x text-primary"></i>
+                                <p class="mb-0"><strong>Uptime</strong></p>
+                                <span class="badge bg-primary">{{ system_health.uptime_hours }}h</span>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="health-metric">
+                                <i class="fas fa-exclamation-triangle fa-2x {% if system_health.error_rate < 5 %}text-success{% else %}text-danger{% endif %}"></i>
+                                <p class="mb-0"><strong>Error Rate</strong></p>
+                                <span class="badge {% if system_health.error_rate < 5 %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ system_health.error_rate }}%
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="health-metric">
+                                <i class="fas fa-university fa-2x text-success"></i>
+                                <p class="mb-0"><strong>Donation Accounts</strong></p>
+                                <span class="badge bg-success">{{ total_donations }} Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core System Metrics -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ total_users }}</h4>
+                            <p class="card-text">Total Users</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card bg-gradient-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ pending_approvals }}</h4>
+                            <p class="card-text">Pending Approvals</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-user-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card bg-gradient-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ total_campaigns }}</h4>
+                            <p class="card-text">Total Campaigns</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-bullhorn fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card bg-gradient-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ total_disciplinary }}</h4>
+                            <p class="card-text">Disciplinary Actions</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-gavel fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- System Administration Tools -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-tools"></i> ICT Technical Monitoring Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-secondary w-100 p-3" disabled title="ICT Admin monitors technical aspects only">
+                                <i class="fas fa-user-check fa-2x mb-2"></i><br>
+                                <strong>Technical Monitoring</strong><br>
+                                <small>System Oversight Only</small>
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('campaigns.manage') }}" class="btn btn-outline-success w-100 p-3">
+                                <i class="fas fa-bullhorn fa-2x mb-2"></i><br>
+                                <strong>Campaign Control</strong><br>
+                                <small>Approve/Reject Content</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('events.manage') }}" class="btn btn-outline-info w-100 p-3">
+                                <i class="fas fa-calendar fa-2x mb-2"></i><br>
+                                <strong>Event Oversight</strong><br>
+                                <small>Monitor All Events</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('disciplinary.view_actions') }}" class="btn btn-outline-danger w-100 p-3">
+                                <i class="fas fa-gavel fa-2x mb-2"></i><br>
+                                <strong>Disciplinary Records</strong><br>
+                                <small>View All Records</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('duty_logs.manage_duties') }}" class="btn btn-outline-warning w-100 p-3">
+                                <i class="fas fa-tasks fa-2x mb-2"></i><br>
+                                <strong>Duty Logs</strong><br>
+                                <small>Monitor All Duties</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('donations.manage') }}" class="btn btn-outline-secondary w-100 p-3">
+                                <i class="fas fa-university fa-2x mb-2"></i><br>
+                                <strong>Donation Accounts</strong><br>
+                                <small>Monitor Bank Details</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('media.manage') }}" class="btn btn-outline-dark w-100 p-3">
+                                <i class="fas fa-photo-video fa-2x mb-2"></i><br>
+                                <strong>Media Management</strong><br>
+                                <small>Approve/Reject Media</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-info w-100 p-3" onclick="generateSystemReport()">
+                                <i class="fas fa-chart-line fa-2x mb-2"></i><br>
+                                <strong>System Report</strong><br>
+                                <small>Generate Full Report</small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role Distribution Analysis -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> User Role Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for role, count in role_stats.items() %}
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <h4 class="text-primary">{{ count }}</h4>
+                                <p class="mb-0">{{ role.replace('_', ' ')|title }}</p>
+                                <div class="progress progress-sm">
+                                    <div class="progress-bar" style="width: {{ (count / total_users * 100) if total_users > 0 else 0 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Log -->
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> System Audit Log (Last 30 Days)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Date/Time</th>
+                                    <th>Activity</th>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for activity in recent_activities %}
+                                <tr>
+                                    <td>{{ activity.created_at.strftime('%m/%d/%y %H:%M') }}</td>
+                                    <td>{{ activity.description }}</td>
+                                    <td>{{ activity.user.full_name }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ activity.type|title }}</span>
+                                    </td>
+                                    <td>
+                                        {% if activity.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                        {% elif activity.status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% elif activity.status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ activity.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No recent activities</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- ICT Admin Profile -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0"><i class="fas fa-user-shield"></i> ICT Administrator</h6>
+                </div>
+                <div class="card-body text-center">
+                    {% if current_user.photo %}
+                    <img src="{{ url_for('static', filename=current_user.photo) }}" 
+                         class="rounded-circle mb-3" width="80" height="80" alt="Profile">
+                    {% else %}
+                    <div class="bg-danger rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                         style="width: 80px; height: 80px;">
+                        <i class="fas fa-user fa-2x text-white"></i>
+                    </div>
+                    {% endif %}
+                    <h6>{{ current_user.full_name }}</h6>
+                    <p class="text-muted mb-2">{{ current_user.role_title or 'ICT System Administrator' }}</p>
+                    <p class="small text-muted">{{ current_user.email }}</p>
+                    <a href="{{ url_for('staff.edit_profile') }}" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Geographic Distribution -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-map-marked-alt"></i> Geographic Distribution</h6>
+                </div>
+                <div class="card-body">
+                    {% for zone in zones %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold">{{ zone.name }}</span>
+                            <span class="text-success">{{ zone.users }} users</span>
+                        </div>
+                        <div class="progress progress-sm">
+                            <div class="progress-bar bg-success" style="width: {{ zone.performance }}%"></div>
+                        </div>
+                        <small class="text-muted">{{ zone.lgas }} LGAs</small>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No zone data available</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Critical Pending Approvals -->
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Critical Pending Approvals</h6>
+                </div>
+                <div class="card-body">
+                    {% for user in pending_users[:10] %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                        <div>
+                            <small class="fw-bold">{{ user.full_name }}</small><br>
+                            <small class="text-muted">{{ user.role_type.value.replace('_', ' ')|title }}</small><br>
+                            <small class="text-muted">{{ user.created_at.strftime('%m/%d %H:%M') }}</small>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-success btn-sm" 
+                                    onclick="approveUser({{ user.id }})">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" 
+                                    onclick="rejectUser({{ user.id }})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">No pending approvals</p>
+                    {% endfor %}
+                    {% if pending_users|length > 10 %}
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('leadership.approvals') }}" class="btn btn-warning btn-sm">
+                            View All {{ pending_approvals }} <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+.bg-gradient-primary { background: linear-gradient(45deg, #007bff, #0056b3); }
+.bg-gradient-success { background: linear-gradient(45deg, #28a745, #1e7e34); }
+.bg-gradient-warning { background: linear-gradient(45deg, #ffc107, #d39e00); }
+.bg-gradient-danger { background: linear-gradient(45deg, #dc3545, #b21f2f); }
+.bg-gradient-info { background: linear-gradient(45deg, #17a2b8, #117a8b); }
+
+.progress-sm { height: 0.5rem; }
+
+.health-metric {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: #f8f9fa;
+    margin-bottom: 1rem;
+}
+
+.card { 
+    transition: transform 0.2s ease, box-shadow 0.2s ease; 
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.card:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn { 
+    transition: all 0.3s ease; 
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0,0,0,0.02);
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.card-header {
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+
+.text-danger { color: #dc3545 !important; }
+.text-warning { color: #ffc107 !important; }
+.text-success { color: #28a745 !important; }
+.text-info { color: #17a2b8 !important; }
+.text-primary { color: #007bff !important; }
+</style>
+
+<!-- Scripts -->
+<script>
+function approveUser(userId) {
+    if (confirm('Approve this user? This action cannot be undone.')) {
+        fetch('/leadership/approve_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({user_id: userId})
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error approving user. Please try again.');
+            }
+        }).catch(error => {
+            alert('Network error. Please try again.');
+        });
+    }
+}
+
+function rejectUser(userId) {
+    if (confirm('Reject this user? This action cannot be undone.')) {
+        fetch('/leadership/reject_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({user_id: userId})
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error rejecting user. Please try again.');
+            }
+        }).catch(error => {
+            alert('Network error. Please try again.');
+        });
+    }
+}
+
+function generateSystemReport() {
+    alert('System report generation functionality will be implemented. This will generate a comprehensive PDF report of all system activities, user statistics, and health metrics.');
+}
+
+// Auto-refresh system health every 5 minutes
+setInterval(function() {
+    // In a real implementation, this would fetch updated system health data
+    console.log('Auto-refreshing system health data...');
+}, 300000);
+
+// Real-time clock
+function updateClock() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString();
+    document.title = `ICT Admin Dashboard - ${timeStr}`;
+}
+setInterval(updateClock, 1000);
+
+// Initialize personalized greeting
+document.addEventListener('DOMContentLoaded', function() {
+    const userName = {{ current_user.full_name|tojson }};
+    const roleTitle = {{ "ICT Administrator"|tojson }};
+    const taskReminder = {{ "please monitor system health and manage technical infrastructure"|tojson }};
+    
+    initializeGreeting(userName, roleTitle, taskReminder);
+});
+</script>
+{% endblock %}

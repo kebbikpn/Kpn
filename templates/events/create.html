@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Create Event{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card shadow">
+                <div class="card-header bg-kpn-green text-white">
+                    <h4 class="mb-0"><i class="fas fa-calendar-plus"></i> Create New Event</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Event Title</label>
+                                    <input type="text" class="form-control" id="title" name="title" required 
+                                           placeholder="Enter event title...">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="scope" class="form-label">Event Scope</label>
+                                    <select class="form-select" id="scope" name="scope" required onchange="updateScopeFields()">
+                                        <option value="">Select scope...</option>
+                                        <option value="state">State-wide</option>
+                                        <option value="zone">Zonal</option>
+                                        <option value="lga">LGA</option>
+                                        <option value="ward">Ward</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Event Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" 
+                                    placeholder="Describe the event details..."></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="event_date" class="form-label">Event Date & Time</label>
+                                    <input type="datetime-local" class="form-control" id="event_date" name="event_date" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="location" class="form-label">Location</label>
+                                    <input type="text" class="form-control" id="location" name="location" 
+                                           placeholder="Event venue or location...">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Scope-specific fields (hidden by default) -->
+                        <div id="scope-fields" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-4" id="zone-field" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="zone_id" class="form-label">Zone</label>
+                                        <select class="form-select" id="zone_id" name="zone_id">
+                                            <option value="">Select zone...</option>
+                                            <!-- Zone options will be populated -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="lga-field" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="lga_id" class="form-label">LGA</label>
+                                        <select class="form-select" id="lga_id" name="lga_id">
+                                            <option value="">Select LGA...</option>
+                                            <!-- LGA options will be populated -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="ward-field" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="ward_id" class="form-label">Ward</label>
+                                        <select class="form-select" id="ward_id" name="ward_id">
+                                            <option value="">Select ward...</option>
+                                            <!-- Ward options will be populated -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('events.manage') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-kpn-primary">
+                                <i class="fas fa-save"></i> Create Event
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateScopeFields() {
+    const scope = document.getElementById('scope').value;
+    const scopeFields = document.getElementById('scope-fields');
+    const zoneField = document.getElementById('zone-field');
+    const lgaField = document.getElementById('lga-field');
+    const wardField = document.getElementById('ward-field');
+    
+    // Hide all fields first
+    scopeFields.style.display = 'none';
+    zoneField.style.display = 'none';
+    lgaField.style.display = 'none';
+    wardField.style.display = 'none';
+    
+    if (scope && scope !== 'state') {
+        scopeFields.style.display = 'block';
+        
+        if (scope === 'zone' || scope === 'lga' || scope === 'ward') {
+            zoneField.style.display = 'block';
+        }
+        if (scope === 'lga' || scope === 'ward') {
+            lgaField.style.display = 'block';
+        }
+        if (scope === 'ward') {
+            wardField.style.display = 'block';
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,11 @@
+Flask
+gunicorn
+Flask-Caching
+Flask-Login
+Flask-SQLAlchemy
+Flask-WTF
+SQLAlchemy
+Werkzeug
+requests
+Pillow
+facebook-sdk
